@@ -1,0 +1,55 @@
+/* scrollbar start */
+.beautify-scroll-container {
+    position: relative !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    overflow-anchor: none;
+    &:hover {
+        .beautify-scroll__y-bar {
+            width: 5px;
+        }
+
+        .beautify-scroll__x-bar {
+            height: 5px;
+        }
+
+        .beautify-scroll__y-thumb, .beautify-scroll__x-thumb {
+            opacity: 0.75;
+        }
+    }
+}
+
+.beautify-scroll__y-bar, .beautify-scroll__x-bar {
+    position: absolute;
+    background-color: transparent;
+    z-index: 100;
+    transition: all .2s linear;
+}
+
+.beautify-scroll__y-bar {
+    width: 0px;
+    transition: width .2s ease-in-out;
+}
+
+.beautify-scroll__x-bar {
+    height: 0px;
+    transition: height .2s ease-in-out;
+}
+
+.beautify-scroll__y-thumb, .beautify-scroll__x-thumb {
+    position: absolute;
+    border-radius: 6px;
+    background-color: #aaa;
+    opacity: 0;
+    transition: all .2s linear;
+}
+
+.beautify-scroll__x-thumb {
+    height: 5px;
+}
+
+.beautify-scroll__y-thumb {
+    width: 5px;
+}
+
+/* scrollbar end */
