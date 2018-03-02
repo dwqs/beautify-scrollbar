@@ -10,11 +10,21 @@ import {
 
 export default class BeautifyScrollBar {
     constructor (element, opts = {}) {
+        if (typeof element === 'string') {
+            element = document.querySelector(element);
+        }
+    
+        if (!element || !element.nodeName) {
+            throw new Error('no element is specified to initialize BeautifyScrollBar');
+        }
+            
         const defaultOpts = {
             wheelSpeed: 1
         };
 
         this.element = element;
+        this.ownerDocument = this.element.ownerDocument || document;
+        this.rect = this.element.getBoundingClientRect();
         this.options = Object.assign({}, defaultOpts, opts);
 
         this.xBar = null;
@@ -45,11 +55,12 @@ export default class BeautifyScrollBar {
             this.element.className = cls + ' beautify-scroll-container';
         }
 
-        this.contentWidth = isNaN(this.options.contentWidth) ? element.clientWidth : this.options.contentWidth;
-        this.contentHeight = isNaN(this.options.contentHeight) ? element.clientHeight : this.options.contentHeight;
+        // contentWidth/contentHeight of this.options to scroll based container lazy-load.
+        this.contentWidth = isNaN(this.options.contentWidth) ? Math.max(this.element.scrollWidth, element.clientWidth) : this.options.contentWidth;
+        this.contentHeight = isNaN(this.options.contentHeight) ? Math.max(this.element.scrollHeight, element.clientHeight) : this.options.contentHeight;
 
-        this.containerWidth = element.clientWidth;
-        this.containerHeight = element.clientHeight;
+        this.containerWidth = this.rect.width || element.clientWidth;
+        this.containerHeight = this.rect.height || element.clientHeight;
 
         this.maxScrollLeft = this.contentWidth - this.containerWidth;
         this.maxScrollTop = this.contentHeight - this.containerHeight;
@@ -128,8 +139,8 @@ export default class BeautifyScrollBar {
         e.stopPropagation();
         e.preventDefault();
 
-        this.element.ownerDocument.removeEventListener('mousemove', this.mouseMoveHandler);
-        this.element.ownerDocument.removeEventListener('mouseup', this.mouseUpHandler);
+        this.ownerDocument.removeEventListener('mousemove', this.mouseMoveHandler);
+        this.ownerDocument.removeEventListener('mouseup', this.mouseUpHandler);
     }
 
     mouseDownHandler (direct, e) {
@@ -146,8 +157,8 @@ export default class BeautifyScrollBar {
             this.startingScrollTop = this.element.scrollTop;
         }
         this.dragDirect = direct;
-        this.element.ownerDocument.addEventListener('mousemove', this.mouseMoveHandler, false);
-        this.element.ownerDocument.addEventListener('mouseup', this.mouseUpHandler, false);
+        this.ownerDocument.addEventListener('mousemove', this.mouseMoveHandler, false);
+        this.ownerDocument.addEventListener('mouseup', this.mouseUpHandler, false);
     }
 
     updateScrollBarStyle () {
