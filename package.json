@@ -31,7 +31,7 @@
     "prepublishOnly": "npm run build",
     "ilint": "npx eslint src/**/*.js",
     "fix": "npx eslint --fix src/**/*.js",
-    "test": "npm run ilint",
+    "test": "npm run build",
     "commitmsg": "npx commitlint -e",
     "dev": "npx cross-env NODE_ENV=development node ./build/dev-server.js",
     "build": "rm -rf dist && npx cross-env NODE_ENV=production npx webpack --config ./webpack.build.config.js --hide-modules",
