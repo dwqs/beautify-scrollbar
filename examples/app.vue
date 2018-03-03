@@ -23,6 +23,7 @@
             <container></container>
             <h3 :style="{width: '600px'}">Infinite Scrolling</h3>
             <infinite-scrolling></infinite-scrolling>
+            <p :style="{textAlign: 'left'}">See it in examples/scroll.vue</p>
         </div>
     </div>
 </template>
