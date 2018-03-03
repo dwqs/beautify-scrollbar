@@ -19,8 +19,7 @@ const events = {
     'x-start': 'bs-x-reach-start',
     'x-end': 'bs-x-reach-end',
     'y-start': 'bs-y-reach-start',
-    'y-end': 'bs-y-reach-end',
-    'threshold': 'threshold'
+    'y-end': 'bs-y-reach-end'
 };
 
 export default class BeautifyScrollBar {
