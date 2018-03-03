@@ -37,35 +37,47 @@ Visit the [examples](https://dwqs.github.io/beautify-scrollbar).
 >Note: the height of this container element which is returned by `getBoundingClientRect()` can not be 0, it must hava a `height` style.
 
 ## Options
-### wheelSpeed {Number}
+### wheelSpeed
+**Type:** `Number`
+
+**Default:** `1`
+
 The scroll speed applied to mousewheel event.
 
+### threshold
+**Type:** `Number`
+
 **Default:** `1`
 
-### threshold {Number}
 The threshold value to trigger next-fetch in infinite scrolling.
 
-**Default:** `1`
+### shownScrollbarX
+**Type:** `Boolean`
 
-### shownScrollbarX {Boolean}
+**Default:** `true`
+
 When set to false, the scroll bar in X axis will not be available, regardless of the content width.
 
+### shownScrollbarY
+**Type:** `Boolean`
+
 **Default:** `true`
 
-### shownScrollbarY {Boolean}
 When set to false, the scroll bar in Y axis will not be available, regardless of the content height.
 
-**Default:** `true`
+### maxThumbXLength
+**Type:** `Number`
 
-### maxThumbXLength {Number}
+**Default:** `undefined`
+
 When set to an integer value, the X thumb part of the scrollbar will not expand over that number of pixels.
 
-**Default:** `true`
+### maxThumbYLength 
+**Type:** `Number`
 
-### maxThumbYLength {Number}
+**Default:** `undefined`
+
 When set to an integer value, the Y thumb part of the scrollbar will not expand over that number of pixels.
-
-**Default:** `true`
 
 ## Events
 `beautify-scrollbar` dispatches custom events.
