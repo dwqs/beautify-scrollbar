@@ -99,9 +99,16 @@ This event fires when scrolling reaches the start of the x-axis.
 This event fires when scrolling reaches the end of the x-axis.
 
 ### `bs-threshold`
-This event fires when `diff-value` reaches the end of the `options.threshold`.
+This event fires when `diff-value` is lte the `options.threshold`.
 
 >diff-value = container.scrollHeight - container.scrollTop - container.height
+
+## API
+### update([options])
+Update some props of instance when you need. Maybe it's useful when it combines with [v2-lazy-list](https://github.com/dwqs/v2-lazy-list);
+
+### destroy
+Destroy the instance and will unbind events whose instance bind.
 
 ## Development
 ```
