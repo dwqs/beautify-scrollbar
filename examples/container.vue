@@ -10,7 +10,7 @@
     import BeautifyScrollbar from '../src/index';
     export default {
         mounted () {
-            this.bs = new BeautifyScrollbar('#container')
+            const bs = new BeautifyScrollbar('#container');
         }
     }
 </script>
