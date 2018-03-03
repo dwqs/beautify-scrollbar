@@ -63,11 +63,11 @@ export default class BeautifyScrollBar {
 
     _computed () {
         // contentWidth/contentHeight of this.options to scroll based container lazy-load.
-        this.contentWidth = isNaN(this.options.contentWidth) ? Math.max(this.element.scrollWidth, element.clientWidth) : this.options.contentWidth;
-        this.contentHeight = isNaN(this.options.contentHeight) ? Math.max(this.element.scrollHeight, element.clientHeight) : this.options.contentHeight;
+        this.contentWidth = isNaN(this.options.contentWidth) ? Math.max(this.element.scrollWidth, this.element.clientWidth) : this.options.contentWidth;
+        this.contentHeight = isNaN(this.options.contentHeight) ? Math.max(this.element.scrollHeight, this.element.clientHeight) : this.options.contentHeight;
 
-        this.containerWidth = this.rect.width || element.clientWidth;
-        this.containerHeight = this.rect.height || element.clientHeight;
+        this.containerWidth = this.rect.width || this.element.clientWidth;
+        this.containerHeight = this.rect.height || this.element.clientHeight;
 
         this.maxScrollLeft = this.contentWidth - this.containerWidth;
         this.maxScrollTop = this.contentHeight - this.containerHeight;
@@ -113,6 +113,15 @@ export default class BeautifyScrollBar {
         } else if (typeof window.onmousewheel !== 'undefined') {
             this.element.addEventListener('mousewheel', this.wheelEventHandler, false);
         }
+
+        this.element.addEventListener('mouseenter', () => {
+            this.yThumb && addClass(this.yThumb, 'shown');
+            this.xThumb && addClass(this.xThumb, 'shown');
+        }, false);
+        this.element.addEventListener('mouseleave', () => {
+            this.yThumb && removeClass(this.yThumb, 'shown');
+            this.xThumb && removeClass(this.xThumb, 'shown');
+        }, false);
     }
 
     _docMouseMoveHandler (e) {
@@ -136,23 +145,33 @@ export default class BeautifyScrollBar {
         e.stopPropagation();
         e.preventDefault();
 
+        if (this.dragDirect === 'x') {
+            this.xThumb && removeClass(this.xThumb, 'focus');
+        }
+
+        if (this.dragDirect === 'y') {
+            this.yThumb && removeClass(this.yThumb, 'focus');
+        }
+
         this.ownerDocument.removeEventListener('mousemove', this.docMouseMoveHandler);
         this.ownerDocument.removeEventListener('mouseup', this.docMouseUpHandler);
     }
 
     _mouseDownHandler (direct, e) {
-        // this.element
+        // current element
         e.stopPropagation();
         e.preventDefault();
-
+        
         if (direct === 'x') {
             this.startingMousePageX = e.pageX;
             this.startingScrollLeft = this.element.scrollLeft;
+            this.xThumb && addClass(this.xThumb, 'focus');
         }
 
         if (direct === 'y') {
             this.startingMousePageY = e.pageY;
             this.startingScrollTop = this.element.scrollTop;
+            this.yThumb && addClass(this.yThumb, 'focus');
         }
         this.dragDirect = direct;
         this.ownerDocument.addEventListener('mousemove', this.docMouseMoveHandler, false);
@@ -186,12 +205,12 @@ export default class BeautifyScrollBar {
         // Down is positive, Up is negative
         const [deltaX, deltaY] = getDeltaFromEvent(e);
 
-        if (this._shouldUpdateScrollLeft(deltaY)) {
+        if (this._shouldUpdateScrollLeft(deltaX)) {
             const scrollTop = this.element.scrollTop - deltaY * this.options.wheelSpeed;
             this.element.scrollTop = scrollTop > this.maxScrollTop ? this.maxScrollTop : scrollTop;
         }
 
-        if (this._shouldUpdateScrollTop(deltaX)) {
+        if (this._shouldUpdateScrollTop(deltaY)) {
             const scrollLeft = this.element.scrollLeft + deltaX * this.options.wheelSpeed;
             this.element.scrollLeft = scrollLeft > this.maxScrollLeft ? this.maxScrollLeft : scrollLeft;
         } 
@@ -228,6 +247,8 @@ export default class BeautifyScrollBar {
     }
 
     _unbindEvent () {
+        this.element.removeEventListener('mouseenter');
+        this.element.removeEventListener('mouseleave');
         this.element.removeEventListener('wheel', this.wheelEventHandler);
         this.element.removeEventListener('mousewheel', this.wheelEventHandler);
         this.xThumb && this.xThumb.removeAllEventListener('mousedown');

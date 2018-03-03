@@ -4,52 +4,54 @@
     overflow: hidden !important;
     box-sizing: border-box !important;
     overflow-anchor: none;
-    &:hover {
-        .beautify-scroll__y-bar {
-            width: 5px;
-        }
-
-        .beautify-scroll__x-bar {
-            height: 5px;
-        }
-
-        .beautify-scroll__y-thumb, .beautify-scroll__x-thumb {
-            opacity: 0.75;
-        }
-    }
 }
 
 .beautify-scroll__y-bar, .beautify-scroll__x-bar {
     position: absolute;
     background-color: transparent;
     z-index: 100;
-    transition: all .2s linear;
+    background-color: transparent;  //#EFEFEF
+    // transition: all .2s linear;
 }
 
 .beautify-scroll__y-bar {
-    width: 0px;
-    transition: width .2s ease-in-out;
+    // width: 0px;
+    width: 10px;
+    // transition: width .2s ease-in-out;
 }
 
 .beautify-scroll__x-bar {
-    height: 0px;
-    transition: height .2s ease-in-out;
+    // height: 0px;
+    height: 10px;
+    // transition: height .2s ease-in-out;
 }
 
 .beautify-scroll__y-thumb, .beautify-scroll__x-thumb {
     position: absolute;
     border-radius: 6px;
-    background-color: #aaa;
+    background-color: #B8B8B8;
     opacity: 0;
     transition: all .2s linear;
+    &:hover {
+        background-color: #777777;
+    }
+    &.shown {
+        opacity: 1;
+    }
+    &.focus {
+        opacity: 1;
+        background-color: #777777;
+    }
 }
 
 .beautify-scroll__x-thumb {
-    height: 5px;
+    height: 7px;
+    bottom: 0;
 }
 
 .beautify-scroll__y-thumb {
-    width: 5px;
+    width: 7px;
+    right: 0;
 }
 
 /* scrollbar end */
