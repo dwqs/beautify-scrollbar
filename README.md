@@ -58,17 +58,17 @@ When set to false, the scroll bar in Y axis will not be available, regardless of
 **Default:** `true`
 
 ### maxThumbXLength {Number}
-When set to an integer value, the thumb part of the scrollbar will not expand over that number of pixels.
+When set to an integer value, the X thumb part of the scrollbar will not expand over that number of pixels.
 
 **Default:** `true`
 
 ### maxThumbYLength {Number}
-When set to an integer value, the thumb part of the scrollbar will not expand over that number of pixels.
+When set to an integer value, the Y thumb part of the scrollbar will not expand over that number of pixels.
 
 **Default:** `true`
 
 ## Events
-beautify-scrollbar dispatches custom events.
+`beautify-scrollbar` dispatches custom events.
 
 ```js
 container.addEventListener('bs-x-reach-end', () => ..., false);
