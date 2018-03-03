@@ -13,6 +13,8 @@ import {
     addClass
 } from './class-helpers';
 
+import createCustomEvent from './custom-event';
+
 export default class BeautifyScrollBar {
     constructor (element, opts = {}) {
         if (typeof element === 'string') {
@@ -39,6 +41,10 @@ export default class BeautifyScrollBar {
             maxThumbXLength: (isNaN(opts.maxThumbXLength) || opts.maxThumbXLength <= 0) ? undefined : opts.maxThumbXLength,
             maxThumbYLength: (isNaN(opts.maxThumbYLength) || opts.maxThumbYLength <= 0) ? undefined : opts.maxThumbYLength
         });
+
+        // record last scroll value
+        this.lastScrollLeft = 0;
+        this.lastScrollTop = 0;
 
         // scrollbar element
         this.xBar = null;
@@ -83,6 +89,9 @@ export default class BeautifyScrollBar {
 
     _createBarEle () {
         if (this.maxScrollTop > 0 && this.options.shownScrollbarY) {
+            if (this.yBar) {
+                remove(this.yBar);
+            }
             this.yBar = createDiv('beautify-scroll__y-bar');
             this.element.appendChild(this.yBar);
             setCSS(this.yBar, { height: this.containerHeight, right: 0, top: 0 });
@@ -99,6 +108,9 @@ export default class BeautifyScrollBar {
         }
 
         if (this.maxScrollLeft > 0 && this.options.shownScrollbarX) {
+            if (this.xBar) {
+                remove(this.xBar);
+            }
             this.xBar = createDiv('beautify-scroll__x-bar');
             this.element.appendChild(this.xBar);
             setCSS(this.xBar, { left: 0, width: this.containerWidth, bottom: 0 });
@@ -196,13 +208,6 @@ export default class BeautifyScrollBar {
         this.xBar && setCSS(this.xBar, { left: this.element.scrollLeft, width: this.containerWidth, bottom: -this.element.scrollTop });
         const xThumbLeft = parseInt(this.element.scrollLeft * (this.containerWidth - this.xThumbWidth) / this.maxScrollLeft, 10);
         this.xThumb && setCSS(this.xThumb, { left: xThumbLeft, width: this.xThumbWidth });
-
-        if (typeof this.options.callBack === 'function') {
-            this.options.callBack({
-                scrollLeft: this.element.scrollLeft,
-                scrollTop: this.element.scrollTop
-            });
-        }
     }
 
     _wheelEventHandler (e) {
@@ -215,27 +220,35 @@ export default class BeautifyScrollBar {
         // Down is positive, Up is negative
         const [deltaX, deltaY] = getDeltaFromEvent(e);
 
-        if (this._shouldUpdateScrollLeft(deltaX)) {
+        const top = this._shouldUpdateScrollTop(deltaY);
+        const left = this._shouldUpdateScrollLeft(deltaX);
+        this.lastScrollLeft = this.element.scrollLeft;
+        this.lastScrollTop = this.element.scrollTop;
+        
+        if (left) {
             const scrollLeft = this.element.scrollLeft + deltaX * this.options.wheelSpeed;
             this.element.scrollLeft = scrollLeft > this.maxScrollLeft ? this.maxScrollLeft : scrollLeft;
         }
 
-        if (this._shouldUpdateScrollTop(deltaY)) {
+        if (top) {
             const scrollTop = this.element.scrollTop - deltaY * this.options.wheelSpeed;
             this.element.scrollTop = scrollTop > this.maxScrollTop ? this.maxScrollTop : scrollTop;
         } 
-
+        
         this._updateScrollBarStyle();
     }
 
     _shouldUpdateScrollLeft (deltaX) {
+        const diff = this.element.scrollLeft - this.lastScrollLeft;
         if (this.element.scrollLeft === this.maxScrollLeft && deltaX > 0) {
             // reach to right
+            diff && this.element.dispatchEvent(createCustomEvent('bs-x-reach-end'));
             return false;
         }
 
         if (this.element.scrollLeft === 0 && deltaX <= 0) {
             // reach to left
+            diff && this.element.dispatchEvent(createCustomEvent('bs-x-reach-start'));
             return false;
         }
 
@@ -243,13 +256,16 @@ export default class BeautifyScrollBar {
     }
 
     _shouldUpdateScrollTop (deltaY) {
+        const diff = this.element.scrollTop - this.lastScrollTop;
         if (this.element.scrollTop === this.maxScrollTop && deltaY < 0) {
             // reach to bottom
+            diff && this.element.dispatchEvent(createCustomEvent('bs-y-reach-end'));
             return false;
         }
 
         if (this.element.scrollTop === 0 && deltaY >= 0) {
             // reach to top
+            diff && this.element.dispatchEvent(createCustomEvent('bs-y-reach-start'));
             return false;
         }
 
