@@ -8,9 +8,10 @@ function toArray (element) {
 };
 
 function removeClass (element, cls) {
-    if (!cls || typeof cls !== 'string') {
+    if (!cls || typeof cls !== 'string' || !element || !element.nodeName) {
         return void 0;
     }
+    
     let _curClasses = [];
     let curClasses = toArray(element);
     let classes = cls.split(' ');
@@ -34,6 +35,10 @@ function removeClass (element, cls) {
 }
 
 function addClass (element, cls) {
+    if (!cls || typeof cls !== 'string' || !element || !element.nodeName) {
+        return void 0;
+    }
+
     let curClasses = toArray(element);
     let classes = cls.split(' ');
 
