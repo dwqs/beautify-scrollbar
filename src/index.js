@@ -340,11 +340,12 @@ export default class BeautifyScrollBar {
         this.yThumb && this.yThumb.removeAllEventListener('mousedown');
     }
 
-    update () {
+    update (opts = {}) {
         if (!this.element) {
             return;
         }
         // async get data
+        this.options = Object.assign({}, this.options, opts); // support container lazy-load
         this._computed();
         this._createBarEle(true);
     }
