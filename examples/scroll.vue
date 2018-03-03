@@ -7,7 +7,7 @@
                 </li>
             </ul>
         </div>
-        <div class="loading" v-show="loading">
+        <div class="loading" v-if="loading && text">
             {{text}}
         </div>
     </div>
@@ -72,7 +72,8 @@
                 this.loading = true;
                 setTimeout(() => {
                     if (this.page === 5) {
-                        this.text = 'No more data';
+                        this.text = '';
+                        this.list.push('No more data');
                         return;
                     }
                     this.appendData();
