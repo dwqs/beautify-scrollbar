@@ -24,13 +24,21 @@ export default class BeautifyScrollBar {
         }
             
         const defaultOpts = {
-            wheelSpeed: 1
+            wheelSpeed: 1,
+            shownScrollbarX: true,
+            shownScrollbarY: true,
+            maxThumbXLength: undefined,
+            maxThumbYLength: undefined
         };
 
         this.element = element;
         this.ownerDocument = this.element.ownerDocument || document;
         this.rect = this.element.getBoundingClientRect();
-        this.options = Object.assign({}, defaultOpts, opts);
+        this.options = Object.assign({}, defaultOpts, opts, {
+            wheelSpeed: (isNaN(opts.wheelSpeed) || opts.wheelSpeed <= 0) ? 1 : opts.wheelSpeed,
+            maxThumbXLength: (isNaN(opts.maxThumbXLength) || opts.maxThumbXLength <= 0) ? undefined : opts.maxThumbXLength,
+            maxThumbYLength: (isNaN(opts.maxThumbYLength) || opts.maxThumbYLength <= 0) ? undefined : opts.maxThumbYLength
+        });
 
         // scrollbar element
         this.xBar = null;
@@ -74,7 +82,7 @@ export default class BeautifyScrollBar {
     }
 
     _createBarEle () {
-        if (this.maxScrollTop > 0) {
+        if (this.maxScrollTop > 0 && this.options.shownScrollbarY) {
             this.yBar = createDiv('beautify-scroll__y-bar');
             this.element.appendChild(this.yBar);
             setCSS(this.yBar, { height: this.containerHeight, right: 0, top: 0 });
@@ -82,14 +90,15 @@ export default class BeautifyScrollBar {
 
             this.yThumb = createDiv('beautify-scroll__y-thumb');
             this.yBar.appendChild(this.yThumb);
-            this.yThumbHeight = parseInt(this.containerHeight * this.containerHeight / this.contentHeight, 10);
+            const yThumbHeight = parseInt(this.containerHeight * this.containerHeight / this.contentHeight, 10);
+            this.yThumbHeight = (isNaN(this.options.maxThumbYLength) || yThumbHeight <= this.options.maxThumbYLength) ? yThumbHeight : this.options.maxThumbYLength;
             setCSS(this.yThumb, { top: 0, height: this.yThumbHeight });
             
             this.yScrollFactor = (this.contentHeight - this.containerHeight) / (this.containerHeight - this.yThumbHeight);
             this.yThumb.addEventListener('mousedown', this._mouseDownHandler.bind(this, 'y'), false);
         }
 
-        if (this.maxScrollLeft > 0) {
+        if (this.maxScrollLeft > 0 && this.options.shownScrollbarX) {
             this.xBar = createDiv('beautify-scroll__x-bar');
             this.element.appendChild(this.xBar);
             setCSS(this.xBar, { left: 0, width: this.containerWidth, bottom: 0 });
@@ -97,7 +106,8 @@ export default class BeautifyScrollBar {
 
             this.xThumb = createDiv('beautify-scroll__x-thumb');
             this.xBar.appendChild(this.xThumb);
-            this.xThumbWidth = parseInt(this.containerWidth * this.containerWidth / this.contentWidth, 10);
+            const xThumbWidth = parseInt(this.containerWidth * this.containerWidth / this.contentWidth, 10);
+            this.xThumbWidth = (isNaN(this.options.maxThumbXLength) || xThumbWidth <= this.options.maxThumbXLength) ? xThumbWidth : this.options.maxThumbXLength;
             setCSS(this.xThumb, { left: 0, width: this.xThumbWidth });
 
             this.xScrollFactor = (this.contentWidth - this.containerWidth) / (this.containerWidth - this.xThumbWidth);
@@ -206,13 +216,13 @@ export default class BeautifyScrollBar {
         const [deltaX, deltaY] = getDeltaFromEvent(e);
 
         if (this._shouldUpdateScrollLeft(deltaX)) {
-            const scrollTop = this.element.scrollTop - deltaY * this.options.wheelSpeed;
-            this.element.scrollTop = scrollTop > this.maxScrollTop ? this.maxScrollTop : scrollTop;
+            const scrollLeft = this.element.scrollLeft + deltaX * this.options.wheelSpeed;
+            this.element.scrollLeft = scrollLeft > this.maxScrollLeft ? this.maxScrollLeft : scrollLeft;
         }
 
         if (this._shouldUpdateScrollTop(deltaY)) {
-            const scrollLeft = this.element.scrollLeft + deltaX * this.options.wheelSpeed;
-            this.element.scrollLeft = scrollLeft > this.maxScrollLeft ? this.maxScrollLeft : scrollLeft;
+            const scrollTop = this.element.scrollTop - deltaY * this.options.wheelSpeed;
+            this.element.scrollTop = scrollTop > this.maxScrollTop ? this.maxScrollTop : scrollTop;
         } 
 
         this._updateScrollBarStyle();
