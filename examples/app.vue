@@ -19,16 +19,23 @@
             <br>
         </div>
         <div class="demo-wrap">
+            <h3 :style="{width: '600px'}">Basic</h3>
             <container></container>
+            <h3 :style="{width: '600px'}">Infinite Scrolling</h3>
+            <infinite-scrolling></infinite-scrolling>
+            <p :style="{textAlign: 'left'}">See it in examples/scroll.vue</p>
         </div>
     </div>
 </template>
 
 <script>
     import Container from './container.vue';
+    import InfiniteScrolling from './scroll';
+
     export default {
         components: {
-            Container
+            Container,
+            InfiniteScrolling
         }
     }
 </script>
@@ -51,7 +58,6 @@
     .demo-wrap {
         margin: 0 auto;
         width: 750px;
-        height: 500px;
     }
     h2 {
         font-size: 27px;

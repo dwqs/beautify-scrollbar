@@ -9,5 +9,8 @@ function createCustomEvent (eventName) {
     } else {
         const evt = document.createEvent('CustomEvent');
         evt.initCustomEvent(eventName, false, false, null);
+        return evt;
     }
 };
+
+export default createCustomEvent;
