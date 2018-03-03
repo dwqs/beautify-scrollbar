@@ -15,6 +15,14 @@ import {
 
 import createCustomEvent from './custom-event';
 
+const events = {
+    'x-start': 'bs-x-reach-start',
+    'x-end': 'bs-x-reach-end',
+    'y-start': 'bs-y-reach-start',
+    'y-end': 'bs-y-reach-end',
+    'threshold': 'threshold'
+};
+
 export default class BeautifyScrollBar {
     constructor (element, opts = {}) {
         if (typeof element === 'string') {
@@ -240,15 +248,15 @@ export default class BeautifyScrollBar {
 
     _shouldUpdateScrollLeft (deltaX) {
         const diff = this.element.scrollLeft - this.lastScrollLeft;
-        if (this.element.scrollLeft === this.maxScrollLeft && deltaX > 0) {
-            // reach to right
-            diff && this.element.dispatchEvent(createCustomEvent('bs-x-reach-end'));
+        if (this.element.scrollLeft === 0 && deltaX <= 0) {
+            // reach to left
+            diff && this.element.dispatchEvent(createCustomEvent(events['x-start']));
             return false;
         }
 
-        if (this.element.scrollLeft === 0 && deltaX <= 0) {
-            // reach to left
-            diff && this.element.dispatchEvent(createCustomEvent('bs-x-reach-start'));
+        if (this.element.scrollLeft === this.maxScrollLeft && deltaX > 0) {
+            // reach to right
+            diff && this.element.dispatchEvent(createCustomEvent(events['x-end']));
             return false;
         }
 
@@ -257,15 +265,15 @@ export default class BeautifyScrollBar {
 
     _shouldUpdateScrollTop (deltaY) {
         const diff = this.element.scrollTop - this.lastScrollTop;
-        if (this.element.scrollTop === this.maxScrollTop && deltaY < 0) {
-            // reach to bottom
-            diff && this.element.dispatchEvent(createCustomEvent('bs-y-reach-end'));
+        if (this.element.scrollTop === 0 && deltaY >= 0) {
+            // reach to top
+            diff && this.element.dispatchEvent(createCustomEvent(events['y-start']));
             return false;
         }
 
-        if (this.element.scrollTop === 0 && deltaY >= 0) {
-            // reach to top
-            diff && this.element.dispatchEvent(createCustomEvent('bs-y-reach-start'));
+        if (this.element.scrollTop === this.maxScrollTop && deltaY < 0) {
+            // reach to bottom
+            diff && this.element.dispatchEvent(createCustomEvent(events['y-end']));
             return false;
         }
 
