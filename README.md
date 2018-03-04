@@ -18,6 +18,7 @@ yarn add  beautify-scrollbar
 ## Get Started
 
 ```
+import 'beautify-scrollbar/dist/index.css';
 import BeautifyScrollbar from 'beautify-scrollbar';
 
 const container = document.querySelector('#container')
@@ -98,7 +99,10 @@ This event fires when scrolling reaches the start of the x-axis.
 ### `bs-x-reach-end`
 This event fires when scrolling reaches the end of the x-axis.
 
-### `bs-threshold`
+### `bs-update-scroll-value`
+This event fires when scrollLeft or scrollTop is updated.
+
+### `bs-reach-threshold`
 This event fires when `diff-value` is lte the `options.threshold`.
 
 >diff-value = container.scrollHeight - container.scrollTop - container.height
