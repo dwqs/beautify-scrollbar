@@ -14,7 +14,7 @@
             </div> 
             <div class="register">
                 <h4>Basic Usage/基本使用</h4> 
-                <pre>import BeautifyScrollbar from 'beautify-scrollbar';<br><br>const bs = new BeautifyScrollbar('#container')</pre>
+                <pre>import 'beautify-scrollbar/dist/index.css';<br><br>import BeautifyScrollbar from 'beautify-scrollbar';<br><br>const bs = new BeautifyScrollbar('#container')</pre>
             </div>  
             <br>
         </div>
