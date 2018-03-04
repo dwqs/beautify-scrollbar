@@ -20,7 +20,8 @@ const events = {
     'x-end': 'bs-x-reach-end',
     'y-start': 'bs-y-reach-start',
     'y-end': 'bs-y-reach-end',
-    'threshold': 'bs-threshold'
+    'threshold': 'bs-reach-threshold',
+    'scroll-value': 'bs-update-scroll-value'
 };
 
 export default class BeautifyScrollBar {
@@ -39,14 +40,18 @@ export default class BeautifyScrollBar {
             shownScrollbarX: true,
             shownScrollbarY: true,
             maxThumbXLength: undefined,
-            maxThumbYLength: undefined
+            maxThumbYLength: undefined,
+            viewportHeight: undefined // for container lazy-load
         };
 
         this.element = element;
         this.ownerDocument = this.element.ownerDocument || document;
-        this.rect = this.element.getBoundingClientRect();
+        const rect = this.element.getBoundingClientRect();
+        this.rect = Object.assign({}, rect, {
+            height: isNaN(this.options.viewportHeight) ? rect.height : this.options.viewportHeight
+        });
         if (!this.rect.height) {
-            throw new Error('the height of container can not be 0');
+            throw new Error('the container element must have a height style');
         }
         this.options = Object.assign({}, defaultOpts, opts, {
             threshold: (isNaN(opts.threshold) || opts.threshold <= 0) ? 0 : opts.threshold,
@@ -80,6 +85,10 @@ export default class BeautifyScrollBar {
         this.wheelEventHandler = this._wheelEventHandler.bind(this);
         this.docMouseMoveHandler = this._docMouseMoveHandler.bind(this); // throttle(this._mouseMoveHandler.bind(this), 20, 10);
         this.docMouseUpHandler = this._docMouseUpHandler.bind(this);
+        this.downXThumb = this._mouseDownHandler.bind(this, 'x');
+        this.downYThumb = this._mouseDownHandler.bind(this, 'y');
+        this.handleMouseEnter = this._handlerEnter.bind(this);
+        this.handleMouseLeave = this._handlerLeave.bind(this);
 
         addClass(this.element, 'beautify-scroll-container');
 
@@ -113,7 +122,7 @@ export default class BeautifyScrollBar {
 
                 this.yThumb = createDiv('beautify-scroll__y-thumb');
                 this.yBar.appendChild(this.yThumb);
-                this.yThumb.addEventListener('mousedown', this._mouseDownHandler.bind(this, 'y'), false);
+                this.yThumb.addEventListener('mousedown', this.downYThumb, false);
             }
 
             if (isUpdate) {
@@ -143,7 +152,7 @@ export default class BeautifyScrollBar {
 
                 this.xThumb = createDiv('beautify-scroll__x-thumb');
                 this.xBar.appendChild(this.xThumb);
-                this.xThumb.addEventListener('mousedown', this._mouseDownHandler.bind(this, 'x'), false);
+                this.xThumb.addEventListener('mousedown', this.downXThumb, false);
             }
             
             if (isUpdate) {
@@ -162,6 +171,16 @@ export default class BeautifyScrollBar {
         }
     }
 
+    _handlerEnter () {
+        this.yThumb && addClass(this.yThumb, 'shown');
+        this.xThumb && addClass(this.xThumb, 'shown');
+    }
+
+    _handlerLeave () {
+        this.yThumb && removeClass(this.yThumb, 'shown');
+        this.xThumb && removeClass(this.xThumb, 'shown');
+    }
+
     _bindEvent () {
         if (typeof window.onwheel !== 'undefined') {
             // passive: https://developers.google.com/web/tools/lighthouse/audits/passive-event-listeners?hl=zh-cn
@@ -171,36 +190,31 @@ export default class BeautifyScrollBar {
             this.element.addEventListener('mousewheel', this.wheelEventHandler, false);
         }
 
-        this.element.addEventListener('mouseenter', () => {
-            this.yThumb && addClass(this.yThumb, 'shown');
-            this.xThumb && addClass(this.xThumb, 'shown');
-        }, false);
-        this.element.addEventListener('mouseleave', () => {
-            this.yThumb && removeClass(this.yThumb, 'shown');
-            this.xThumb && removeClass(this.xThumb, 'shown');
-        }, false);
+        this.element.addEventListener('mouseenter', this.handleMouseEnter, false);
+        this.element.addEventListener('mouseleave', this.handleMouseLeave, false);
     }
 
     _handleScrollDiff () {
-        const diff = this.element.scrollTop - this.lastScrollTop;
+        const topDiff = this.element.scrollTop - this.lastScrollTop;
+        const leftDiff = this.element.scrollLeft - this.lastScrollLeft;
         if (this.element.scrollTop === 0) {
             // reach to top
-            diff && this.element.dispatchEvent(createCustomEvent(events['y-start']));
+            topDiff && this.element.dispatchEvent(createCustomEvent(events['y-start']));
         }
 
         if (this.element.scrollTop === this.maxScrollTop) {
             // reach to bottom
-            diff && this.element.dispatchEvent(createCustomEvent(events['y-end']));
+            topDiff && this.element.dispatchEvent(createCustomEvent(events['y-end']));
         }
 
         if (this.element.scrollLeft === 0) {
             // reach to left
-            diff && this.element.dispatchEvent(createCustomEvent(events['x-start']));
+            leftDiff && this.element.dispatchEvent(createCustomEvent(events['x-start']));
         }
 
         if (this.element.scrollLeft === this.maxScrollLeft) {
             // reach to right
-            diff && this.element.dispatchEvent(createCustomEvent(events['x-end']));
+            leftDiff && this.element.dispatchEvent(createCustomEvent(events['x-end']));
         }
 
         if ((this.element.scrollHeight - this.element.scrollTop - this.rect.height) <= this.options.threshold) {
@@ -216,6 +230,11 @@ export default class BeautifyScrollBar {
         this.xBar && setCSS(this.xBar, { left: this.element.scrollLeft, width: this.containerWidth, bottom: -this.element.scrollTop });
         const xThumbLeft = parseInt(this.element.scrollLeft * (this.containerWidth - this.xThumbWidth) / this.maxScrollLeft, 10);
         this.xThumb && setCSS(this.xThumb, { left: xThumbLeft, width: this.xThumbWidth });
+
+        // update scroll value for container lazy-load 
+        const topDiff = this.element.scrollTop - this.lastScrollTop;
+        const leftDiff = this.element.scrollLeft - this.lastScrollLeft;
+        (topDiff || leftDiff) && this.element.dispatchEvent(createCustomEvent(events['scroll-value']));
     }
 
     _docMouseMoveHandler (e) {
@@ -332,12 +351,12 @@ export default class BeautifyScrollBar {
     }
 
     _unbindEvent () {
-        this.element.removeEventListener('mouseenter');
-        this.element.removeEventListener('mouseleave');
-        this.element.removeEventListener('wheel', this.wheelEventHandler);
-        this.element.removeEventListener('mousewheel', this.wheelEventHandler);
-        this.xThumb && this.xThumb.removeAllEventListener('mousedown');
-        this.yThumb && this.yThumb.removeAllEventListener('mousedown');
+        this.element.removeEventListener('mouseenter', this.handleMouseEnter, false);
+        this.element.removeEventListener('mouseleave', this.handleMouseLeave, false);
+        this.element.removeEventListener('wheel', this.wheelEventHandler, false);
+        this.element.removeEventListener('mousewheel', this.wheelEventHandler, false);
+        this.xThumb && this.xThumb.removeEventListener('mousedown', this.downXThumb, false);
+        this.yThumb && this.yThumb.removeEventListener('mousedown', this.downYThumb, false);
     }
 
     update (opts = {}) {
@@ -372,5 +391,9 @@ export default class BeautifyScrollBar {
         this.wheelEventHandler = null;
         this.docMouseMoveHandler = null;
         this.docMouseUpHandler = null;
+        this.downXThumb = null;
+        this.downYThumb = null;
+        this.handleMouseEnter = null;
+        this.handleMouseLeave = null;
     }
 };
