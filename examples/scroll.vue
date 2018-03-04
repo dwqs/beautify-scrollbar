@@ -65,7 +65,7 @@
             this.bs = new BeautifyScrollbar(dom, {
                 threshold: 20
             });
-            dom.addEventListener('bs-threshold', () => {
+            dom.addEventListener('bs-reach-threshold', () => {
                 if (this.loading) {
                     return;
                 }
