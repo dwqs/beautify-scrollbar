@@ -40,19 +40,13 @@ export default class BeautifyScrollBar {
             shownScrollbarX: true,
             shownScrollbarY: true,
             maxThumbXLength: undefined,
-            maxThumbYLength: undefined,
-            viewportHeight: undefined // for container lazy-load
+            maxThumbYLength: undefined
         };
 
         this.element = element;
         this.ownerDocument = this.element.ownerDocument || document;
-        const rect = this.element.getBoundingClientRect();
-        this.rect = Object.assign({}, rect, {
-            height: isNaN(this.options.viewportHeight) ? rect.height : this.options.viewportHeight
-        });
-        if (!this.rect.height) {
-            throw new Error('the container element must have a height style');
-        }
+        this.rect = this.element.getBoundingClientRect();
+        
         this.options = Object.assign({}, defaultOpts, opts, {
             threshold: (isNaN(opts.threshold) || opts.threshold <= 0) ? 0 : opts.threshold,
             wheelSpeed: (isNaN(opts.wheelSpeed) || opts.wheelSpeed <= 0) ? 1 : opts.wheelSpeed,
