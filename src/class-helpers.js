@@ -7,6 +7,11 @@ function toArray (element) {
     return classes;
 };
 
+function hasClass (element, cls) {
+    let curClasses = toArray(element);
+    return curClasses.includes(cls);
+}
+
 function removeClass (element, cls) {
     if (!cls || typeof cls !== 'string' || !element || !element.nodeName) {
         return void 0;
@@ -61,5 +66,6 @@ function addClass (element, cls) {
 
 export {
     addClass,
-    removeClass
+    removeClass,
+    hasClass
 };

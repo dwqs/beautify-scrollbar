@@ -10,7 +10,8 @@ import {
 
 import {
     removeClass,
-    addClass
+    addClass,
+    hasClass
 } from './class-helpers';
 
 import createCustomEvent from './custom-event';
@@ -296,6 +297,14 @@ export default class BeautifyScrollBar {
             // disable body scroll
             e.preventDefault();
         } 
+
+        if (this.yThumb && !hasClass(this.yThumb, 'shown')) {
+            addClass(this.yThumb, 'shown');
+        }
+        if (this.xThumb && !hasClass(this.xThumb, 'shown')) {
+            addClass(this.xThumb, 'shown');
+        }
+        
         // Down is positive, Up is negative
         const [deltaX, deltaY] = getDeltaFromEvent(e);
 
