@@ -293,7 +293,7 @@ export default class BeautifyScrollBar {
     _wheelEventHandler (e) {
         // avoid triggering browser scroll
         e.stopPropagation();
-        if (this.maxScrollTop > 0) {
+        if (this.maxScrollTop > 0 || this.maxScrollLeft > 0) {
             // disable body scroll
             e.preventDefault();
         } 
