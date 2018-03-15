@@ -367,6 +367,7 @@ export default class BeautifyScrollBar {
             return;
         }
         // async get data
+        this.rect = this.element.getBoundingClientRect();
         this.options = Object.assign({}, this.options, opts); // support container lazy-load
         this._computed();
         this._createBarEle(true);
