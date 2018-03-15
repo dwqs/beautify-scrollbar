@@ -35,6 +35,11 @@ module.exports = {
             }
         ]
     },
+    
+    stats: {
+        children: false
+    },
+
     plugins: [
         new ExtractTextPlugin({
             filename: '[name].css'
