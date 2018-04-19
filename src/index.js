@@ -15,6 +15,7 @@ import {
 } from './class-helpers';
 
 import createCustomEvent from './custom-event';
+import throttle from './throttle';
 
 const events = {
     'x-start': 'bs-x-reach-start',
@@ -77,8 +78,8 @@ export default class BeautifyScrollBar {
         this.dragDirect = '';
 
         // event binding
-        this.wheelEventHandler = this._wheelEventHandler.bind(this);
-        this.docMouseMoveHandler = this._docMouseMoveHandler.bind(this); // throttle(this._mouseMoveHandler.bind(this), 20, 10);
+        this.wheelEventHandler = throttle(this._wheelEventHandler.bind(this), 20, 10);
+        this.docMouseMoveHandler = this._docMouseMoveHandler.bind(this);
         this.docMouseUpHandler = this._docMouseUpHandler.bind(this);
         this.downXThumb = this._mouseDownHandler.bind(this, 'x');
         this.downYThumb = this._mouseDownHandler.bind(this, 'y');
@@ -133,6 +134,10 @@ export default class BeautifyScrollBar {
             setCSS(this.yThumb, { top: thumbTop, height: this.yThumbHeight });
             
             this.yScrollFactor = (this.contentHeight - this.containerHeight) / (this.containerHeight - this.yThumbHeight);
+        } else {
+            this.yThumb = null;
+            this.yBar && remove(this.yBar);
+            this.yBar = null;
         }
 
         if (this.maxScrollLeft > 0 && this.options.shownScrollbarX) {
@@ -163,6 +168,10 @@ export default class BeautifyScrollBar {
             setCSS(this.xThumb, { left: thumbLeft, width: this.xThumbWidth });
 
             this.xScrollFactor = (this.contentWidth - this.containerWidth) / (this.containerWidth - this.xThumbWidth);
+        } else {
+            this.xThumb = null;
+            this.xBar && remove(this.xBar);
+            this.xBar = null;
         }
     }
 
