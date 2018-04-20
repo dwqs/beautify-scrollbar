@@ -15,7 +15,7 @@ import {
 } from './class-helpers';
 
 import createCustomEvent from './custom-event';
-import throttle from './throttle';
+import debounce from './debounce';
 
 const events = {
     'x-start': 'bs-x-reach-start',
@@ -78,7 +78,7 @@ export default class BeautifyScrollBar {
         this.dragDirect = '';
 
         // event binding
-        this.wheelEventHandler = throttle(this._wheelEventHandler.bind(this), 20, 10);
+        this.wheelEventHandler = debounce(this._wheelEventHandler.bind(this));
         this.docMouseMoveHandler = this._docMouseMoveHandler.bind(this);
         this.docMouseUpHandler = this._docMouseUpHandler.bind(this);
         this.downXThumb = this._mouseDownHandler.bind(this, 'x');
