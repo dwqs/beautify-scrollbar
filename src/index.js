@@ -19,8 +19,10 @@ import debounce from './debounce';
 
 const events = {
     'x-start': 'bs-x-reach-start',
+    'x-middle': 'bs-x-middle',
     'x-end': 'bs-x-reach-end',
     'y-start': 'bs-y-reach-start',
+    'y-middle': 'bs-y-middle',
     'y-end': 'bs-y-reach-end',
     'threshold': 'bs-reach-threshold',
     'scroll-value': 'bs-update-scroll-value'
@@ -199,26 +201,24 @@ export default class BeautifyScrollBar {
     }
 
     _handleScrollDiff () {
-        const topDiff = this.element.scrollTop - this.lastScrollTop;
-        const leftDiff = this.element.scrollLeft - this.lastScrollLeft;
         if (this.element.scrollTop === 0) {
             // reach to top
-            topDiff && this.element.dispatchEvent(createCustomEvent(events['y-start']));
-        }
-
-        if (this.element.scrollTop === this.maxScrollTop) {
+            this.element.dispatchEvent(createCustomEvent(events['y-start']));
+        } else if (this.element.scrollTop === this.maxScrollTop) {
             // reach to bottom
-            topDiff && this.element.dispatchEvent(createCustomEvent(events['y-end']));
+            this.element.dispatchEvent(createCustomEvent(events['y-end']));
+        } else {
+            this.element.dispatchEvent(createCustomEvent(events['y-middle']));
         }
 
         if (this.element.scrollLeft === 0) {
             // reach to left
-            leftDiff && this.element.dispatchEvent(createCustomEvent(events['x-start']));
-        }
-
-        if (this.element.scrollLeft === this.maxScrollLeft) {
+            this.element.dispatchEvent(createCustomEvent(events['x-start']));
+        } else if (this.element.scrollLeft === this.maxScrollLeft) {
             // reach to right
-            leftDiff && this.element.dispatchEvent(createCustomEvent(events['x-end']));
+            this.element.dispatchEvent(createCustomEvent(events['x-end']));
+        } else {
+            this.element.dispatchEvent(createCustomEvent(events['x-middle']));
         }
 
         if ((this.element.scrollHeight - this.element.scrollTop - this.rect.height) <= this.options.threshold) {
@@ -371,15 +371,36 @@ export default class BeautifyScrollBar {
         this.yThumb && this.yThumb.removeEventListener('mousedown', this.downYThumb, false);
     }
 
+    _updateScrollValue (topDiff, leftDiff) {
+        this.lastScrollLeft = this.element.scrollLeft;
+        this.lastScrollTop = this.element.scrollTop;
+
+        this.element.scrollTop = this.element.scrollTop - topDiff;
+        this.element.scrollLeft = this.element.scrollLeft - leftDiff;
+
+        this._updateScrollBarStyle();
+    }
+
     update (opts = {}) {
         if (!this.element) {
             return;
         }
+        const lastRect = this.rect;
+        const { isScrollToBottom, isScrollToLeft } = opts;
+
         // async get data
         this.rect = this.element.getBoundingClientRect();
         this.options = Object.assign({}, this.options, opts); // support container lazy-load
         this._computed();
         this._createBarEle(true);
+
+        const topDiff = this.rect.height - lastRect.height;
+        const leftDiff = this.rect.width - lastRect.width;
+        
+        // v1.0.8: for meeting owner strange project demand
+        if ((topDiff > 0 && isScrollToBottom) || (leftDiff > 0 && isScrollToLeft)) {
+            this._updateScrollValue(topDiff, leftDiff);
+        }
     }
 
     destroy () {
